@@ -938,7 +938,11 @@
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 120, 120, 5, 25 }
+#define X_FEEDRATE_MAX 120
+#define Y_FEEDRATE_MAX 120
+#define Z_FEEDRATE_MAX 5
+#define E0_FEEDRATE_MAX 25
+#define DEFAULT_MAX_FEEDRATE          { X_FEEDRATE_MAX, Y_FEEDRATE_MAX, Z_FEEDRATE_MAX, E0_FEEDRATE_MAX }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -951,12 +955,7 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MIN_ACCELERATION        800
-#define DEFAULT_MAX_ACCELERATION_X     3000
-#define DEFAULT_MAX_ACCELERATION_Y     3000
-#define DEFAULT_MAX_ACCELERATION_Z      200
-#define DEFAULT_MAX_ACCELERATION_E    10000
-#define DEFAULT_MAX_ACCELERATION      { DEFAULT_MAX_ACCELERATION_X, DEFAULT_MAX_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Z, DEFAULT_MAX_ACCELERATION_E }
+#define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 800, 10000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1189,17 +1188,17 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { 0, 20, -1.65 }
+#define NOZZLE_TO_PROBE_OFFSET { 0, 22.3, -1.68 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define PROBING_MARGIN 20
+#define PROBING_MARGIN 15
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_FEEDRATE (DEFAULT_ACCELERATION)
+#define XY_PROBE_FEEDRATE (((X_FEEDRATE_MAX+Y_FEEDRATE_MAX)/2)*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_FEEDRATE_FAST (DEFAULT_ACCELERATION)
+#define Z_PROBE_FEEDRATE_FAST (Z_FEEDRATE_MAX*60)
 
 // Feedrate (mm/min) for the "accurate" probe of each point
 #define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2)
@@ -1240,7 +1239,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 1
+#define MULTIPLE_PROBING 3
 //#define EXTRA_PROBING    1
 
 /**
@@ -1379,7 +1378,7 @@
 // @section machine
 
 // The size of the printable area
-#define X_BED_SIZE 220-15
+#define X_BED_SIZE 220
 #define Y_BED_SIZE 220
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
@@ -1682,7 +1681,7 @@
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
   #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
-  //#define MESH_EDIT_MENU        // Add a menu to edit mesh points
+  #define MESH_EDIT_MENU        // Add a menu to edit mesh points
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
@@ -1755,7 +1754,7 @@
 #endif
 
 // Homing speeds (mm/min)
-#define HOMING_FEEDRATE_MM_M { DEFAULT_MAX_ACCELERATION_X, DEFAULT_MAX_ACCELERATION_Y, DEFAULT_MAX_ACCELERATION_Z }
+#define HOMING_FEEDRATE_MM_M { (X_FEEDRATE_MAX*60), (Y_FEEDRATE_MAX*60), (Z_FEEDRATE_MAX*60) }
 
 // Validate that endstops are triggered on homing moves
 #define VALIDATE_HOMING_ENDSTOPS
@@ -1866,7 +1865,7 @@
 // Preheat Constants - Up to 5 are supported without changes
 //
 #define PREHEAT_1_LABEL       "PLA"
-#define PREHEAT_1_TEMP_HOTEND 180
+#define PREHEAT_1_TEMP_HOTEND 200
 #define PREHEAT_1_TEMP_BED     70
 #define PREHEAT_1_TEMP_CHAMBER  0
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
