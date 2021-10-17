@@ -83,14 +83,7 @@
 #endif
 
 #ifndef FORCE_INLINE
-  #define FORCE_INLINE __attribute__((always_inline)) inline
+  #define FORCE_INLINE inline __attribute__((always_inline))
 #endif
 
 #include "progmem.h"
-
-class __FlashStringHelper;
-typedef const __FlashStringHelper* FSTR_P;
-#ifndef FPSTR
-  #define FPSTR(S) (reinterpret_cast<FSTR_P>(S))
-#endif
-#define FTOP(S) (reinterpret_cast<const char*>(S))
