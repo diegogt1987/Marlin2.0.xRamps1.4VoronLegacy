@@ -88,6 +88,7 @@
 
 // Show the bitmap in Marlin/_Bootscreen.h on startup.
 #define SHOW_CUSTOM_BOOTSCREEN
+#define SHOW_MARLIN_BOOTSCREEN
 
 // Show the bitmap in Marlin/_Statusscreen.h on the status screen.
 //#define CUSTOM_STATUS_SCREEN_IMAGE
