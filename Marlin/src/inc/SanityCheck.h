@@ -597,9 +597,9 @@
   #error "SPINDLE_LASER_PWM (true) is now set with SPINDLE_LASER_USE_PWM (enabled)."
 #endif
 
-#if MOTHERBOARD == BOARD_DUE3DOM_MINI && PIN_EXISTS(TEMP_2) && DISABLED(TEMP_SENSOR_BOARD)
+#if MB(DUE3DOM_MINI) && PIN_EXISTS(TEMP_2) && DISABLED(TEMP_SENSOR_BOARD)
   #warning "Onboard temperature sensor for BOARD_DUE3DOM_MINI has moved from TEMP_SENSOR_2 (TEMP_2_PIN) to TEMP_SENSOR_BOARD (TEMP_BOARD_PIN)."
-#elif MOTHERBOARD == BOARD_BTT_SKR_E3_TURBO && PIN_EXISTS(TEMP_2) && DISABLED(TEMP_SENSOR_BOARD)
+#elif MB(BTT_SKR_E3_TURBO) && PIN_EXISTS(TEMP_2) && DISABLED(TEMP_SENSOR_BOARD)
   #warning "Onboard temperature sensor for BOARD_BTT_SKR_E3_TURBO has moved from TEMP_SENSOR_2 (TEMP_2_PIN) to TEMP_SENSOR_BOARD (TEMP_BOARD_PIN)."
 #endif
 
@@ -900,7 +900,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "MESH_BED_LEVELING and BABYSTEP_ZPROBE_OFFSET is not a valid combination"
   #elif ENABLED(BABYSTEP_ZPROBE_OFFSET) && !HAS_BED_PROBE
     #error "BABYSTEP_ZPROBE_OFFSET requires a probe."
-  #elif ENABLED(BABYSTEP_ZPROBE_GFX_OVERLAY) && !HAS_MARLINUI_U8GLIB
+  #elif ENABLED(BABYSTEP_ZPROBE_GFX_OVERLAY) && NONE(HAS_MARLINUI_U8GLIB, IS_DWIN_MARLINUI)
     #error "BABYSTEP_ZPROBE_GFX_OVERLAY requires a Graphical LCD."
   #elif ENABLED(BABYSTEP_ZPROBE_GFX_OVERLAY) && DISABLED(BABYSTEP_ZPROBE_OFFSET)
     #error "BABYSTEP_ZPROBE_GFX_OVERLAY requires a BABYSTEP_ZPROBE_OFFSET."
@@ -1529,10 +1529,34 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #endif
 
   #if ENABLED(BLTOUCH)
+
+    // BLTouch can't run in 5V mode with a 3.3V probe pin
+    #if ENABLED(BLTOUCH_SET_5V_MODE)
+      #define _5V(P,A,B) WITHIN(P,A,B)
+      #ifdef STM32F1            // STM32F103 5V-tolerant pins
+        #define _IS_5V_TOLERANT(P) (_5V(P,PA8,PA15) || _5V(P,PB2,PB15) || _5V(P,PC6,PC12) || _5V(P,PD0,PD15) || _5V(P,PE0,PE15) || _5V(P,PF0,PF5) || _5V(P,PF11,PF15))
+      #elif defined(ARDUINO_ARCH_SAM)
+        #define _IS_5V_TOLERANT(P) 0 // Assume no 5V tolerance
+      #else
+        #define _IS_5V_TOLERANT(P) 1 // Assume 5V tolerance
+      #endif
+      #if USES_Z_MIN_PROBE_PIN && !_IS_5V_TOLERANT(Z_MIN_PROBE_PIN)
+        #error "BLTOUCH_SET_5V_MODE is not compatible with the Z_MIN_PROBE_PIN."
+      #elif !_IS_5V_TOLERANT(Z_MIN_PIN)
+        #error "BLTOUCH_SET_5V_MODE is not compatible with the Z_MIN_PIN."
+      #endif
+      #undef _IS_5V_TOLERANT
+      #undef _5V
+    #elif NONE(ONBOARD_ENDSTOPPULLUPS, ENDSTOPPULLUPS, ENDSTOPPULLUP_ZMIN, ENDSTOPPULLUP_ZMIN_PROBE)
+      #if USES_Z_MIN_PROBE_PIN
+        #error "BLTOUCH on Z_MIN_PROBE_PIN requires ENDSTOPPULLUP_ZMIN_PROBE, ENDSTOPPULLUPS, or BLTOUCH_SET_5V_MODE."
+      #else
+        #error "BLTOUCH on Z_MIN_PIN requires ENDSTOPPULLUP_ZMIN, ENDSTOPPULLUPS, or BLTOUCH_SET_5V_MODE."
+      #endif
+    #endif
+
     #if BLTOUCH_DELAY < 200
       #error "BLTOUCH_DELAY less than 200 is unsafe and is not supported."
-    #elif DISABLED(BLTOUCH_SET_5V_MODE) && NONE(ONBOARD_ENDSTOPPULLUPS, ENDSTOPPULLUPS, ENDSTOPPULLUP_ZMIN, ENDSTOPPULLUP_ZMIN_PROBE)
-      #error "BLTOUCH without BLTOUCH_SET_5V_MODE requires ENDSTOPPULLUPS, ENDSTOPPULLUP_ZMIN or ENDSTOPPULLUP_ZMIN_PROBE."
     #endif
   #endif
 
@@ -1738,8 +1762,12 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #endif
 #endif
 
-#if ENABLED(MESH_EDIT_GFX_OVERLAY) && !(ENABLED(AUTO_BED_LEVELING_UBL) && EITHER(HAS_MARLINUI_U8GLIB, IS_DWIN_MARLINUI))
-  #error "MESH_EDIT_GFX_OVERLAY requires AUTO_BED_LEVELING_UBL and a Graphical LCD."
+#if ENABLED(MESH_EDIT_GFX_OVERLAY)
+  #if DISABLED(AUTO_BED_LEVELING_UBL)
+    #error "MESH_EDIT_GFX_OVERLAY requires AUTO_BED_LEVELING_UBL."
+  #elif NONE(HAS_MARLINUI_U8GLIB, IS_DWIN_MARLINUI)
+    #error "MESH_EDIT_GFX_OVERLAY requires a Graphical LCD."
+  #endif
 #endif
 
 #if ENABLED(G29_RETRY_AND_RECOVER) && NONE(AUTO_BED_LEVELING_3POINT, AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
@@ -2165,68 +2193,12 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
               #elif !PIN_EXISTS(TEMP_7) && !TEMP_SENSOR_7_IS_DUMMY
                 #error "TEMP_7_PIN not defined for this board."
               #endif
-            #elif TEMP_SENSOR_7 != 0
-              #error "TEMP_SENSOR_7 shouldn't be set with only 7 HOTENDS."
-            #endif
-          #elif TEMP_SENSOR_6 != 0
-            #error "TEMP_SENSOR_6 shouldn't be set with only 6 HOTENDS."
-          #elif TEMP_SENSOR_7 != 0
-            #error "TEMP_SENSOR_7 shouldn't be set with only 6 HOTENDS."
-          #endif
-        #elif TEMP_SENSOR_5 != 0
-          #error "TEMP_SENSOR_5 shouldn't be set with only 5 HOTENDS."
-        #elif TEMP_SENSOR_6 != 0
-          #error "TEMP_SENSOR_6 shouldn't be set with only 5 HOTENDS."
-        #elif TEMP_SENSOR_7 != 0
-          #error "TEMP_SENSOR_7 shouldn't be set with only 5 HOTENDS."
-        #endif
-      #elif TEMP_SENSOR_4 != 0
-        #error "TEMP_SENSOR_4 shouldn't be set with only 4 HOTENDS."
-      #elif TEMP_SENSOR_5 != 0
-        #error "TEMP_SENSOR_5 shouldn't be set with only 4 HOTENDS."
-      #elif TEMP_SENSOR_6 != 0
-        #error "TEMP_SENSOR_6 shouldn't be set with only 4 HOTENDS."
-      #elif TEMP_SENSOR_7 != 0
-        #error "TEMP_SENSOR_7 shouldn't be set with only 4 HOTENDS."
-      #endif
-    #elif TEMP_SENSOR_3 != 0
-      #error "TEMP_SENSOR_3 shouldn't be set with only 3 HOTENDS."
-    #elif TEMP_SENSOR_4 != 0
-      #error "TEMP_SENSOR_4 shouldn't be set with only 3 HOTENDS."
-    #elif TEMP_SENSOR_5 != 0
-      #error "TEMP_SENSOR_5 shouldn't be set with only 3 HOTENDS."
-    #elif TEMP_SENSOR_6 != 0
-      #error "TEMP_SENSOR_6 shouldn't be set with only 3 HOTENDS."
-    #elif TEMP_SENSOR_7 != 0
-      #error "TEMP_SENSOR_7 shouldn't be set with only 3 HOTENDS."
-    #endif
-  #elif TEMP_SENSOR_2 != 0
-    #error "TEMP_SENSOR_2 shouldn't be set with only 2 HOTENDS."
-  #elif TEMP_SENSOR_3 != 0
-    #error "TEMP_SENSOR_3 shouldn't be set with only 2 HOTENDS."
-  #elif TEMP_SENSOR_4 != 0
-    #error "TEMP_SENSOR_4 shouldn't be set with only 2 HOTENDS."
-  #elif TEMP_SENSOR_5 != 0
-    #error "TEMP_SENSOR_5 shouldn't be set with only 2 HOTENDS."
-  #elif TEMP_SENSOR_6 != 0
-    #error "TEMP_SENSOR_6 shouldn't be set with only 2 HOTENDS."
-  #elif TEMP_SENSOR_7 != 0
-    #error "TEMP_SENSOR_7 shouldn't be set with only 2 HOTENDS."
-  #endif
-#elif TEMP_SENSOR_1 != 0
-  #error "TEMP_SENSOR_1 shouldn't be set with only 1 HOTEND."
-#elif TEMP_SENSOR_2 != 0
-  #error "TEMP_SENSOR_2 shouldn't be set with only 1 HOTEND."
-#elif TEMP_SENSOR_3 != 0
-  #error "TEMP_SENSOR_3 shouldn't be set with only 1 HOTEND."
-#elif TEMP_SENSOR_4 != 0
-  #error "TEMP_SENSOR_4 shouldn't be set with only 1 HOTEND."
-#elif TEMP_SENSOR_5 != 0
-  #error "TEMP_SENSOR_5 shouldn't be set with only 1 HOTEND."
-#elif TEMP_SENSOR_6 != 0
-  #error "TEMP_SENSOR_6 shouldn't be set with only 1 HOTEND."
-#elif TEMP_SENSOR_7 != 0
-  #error "TEMP_SENSOR_7 shouldn't be set with only 1 HOTEND."
+            #endif // HOTENDS > 7
+          #endif // HOTENDS > 6
+        #endif // HOTENDS > 5
+      #endif // HOTENDS > 4
+    #endif // HOTENDS > 3
+  #endif // HOTENDS > 2
 #endif // HAS_MULTI_HOTEND
 
 /**
@@ -3260,7 +3232,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #if HAS_MOTOR_CURRENT_I2C
   #if BOTH(DIGIPOT_MCP4018, DIGIPOT_MCP4451)
     #error "Enable only one of DIGIPOT_MCP4018 or DIGIPOT_MCP4451."
-#elif !MB(MKS_SBASE, AZTEEG_X5_GT, AZTEEG_X5_MINI, AZTEEG_X5_MINI_WIFI) \
+  #elif !MB(MKS_SBASE, AZTEEG_X5_GT, AZTEEG_X5_MINI, AZTEEG_X5_MINI_WIFI) \
     && (!defined(DIGIPOTS_I2C_SDA_X) || !defined(DIGIPOTS_I2C_SDA_Y) || !defined(DIGIPOTS_I2C_SDA_Z) || !defined(DIGIPOTS_I2C_SDA_E0) || !defined(DIGIPOTS_I2C_SDA_E1))
       #error "DIGIPOT_MCP4018/4451 requires DIGIPOTS_I2C_SDA_* pins to be defined."
   #endif
@@ -3405,10 +3377,6 @@ static_assert(_PLUS_TEST(4), "HOMING_FEEDRATE_MM_M values must be positive.");
   #if defined(GANTRY_CALIBRATION_SAFE_POSITION) && !defined(GANTRY_CALIBRATION_XY_PARK_FEEDRATE)
     #error "GANTRY_CALIBRATION_SAFE_POSITION Requires GANTRY_CALIBRATION_XY_PARK_FEEDRATE to be set."
   #endif
-#endif
-
-#if BOTH(Z_STEPPER_AUTO_ALIGN, MECHANICAL_GANTRY_CALIBRATION)
-  #error "You cannot use Z_STEPPER_AUTO_ALIGN and MECHANICAL_GANTRY_CALIBRATION at the same time."
 #endif
 
 #if ENABLED(PRINTCOUNTER) && DISABLED(EEPROM_SETTINGS)

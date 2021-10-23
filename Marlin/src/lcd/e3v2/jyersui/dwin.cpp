@@ -419,7 +419,7 @@ void CrealityDWINClass::Draw_Float(float value, uint8_t row, bool selected/*=fal
   if (isnan(value))
     DWIN_Draw_String(true, DWIN_FONT_MENU, Color_White, bColor, xpos - 8, MBASE(row), F(" NaN"));
   else {
-    DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_MENU, Color_White, bColor, digits - log10(minunit) + 1, log10(minunit), xpos, MBASE(row), (value < 0 ? -value : value) * minunit);
+    DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_MENU, Color_White, bColor, digits - log10(minunit) + 1, log10(minunit), xpos, MBASE(row), (value < 0 ? -value : value));
     DWIN_Draw_String(true, DWIN_FONT_MENU, Color_White, bColor, xpos - 8, MBASE(row), value < 0 ? F("-") : F(" "));
   }
 }
@@ -855,7 +855,7 @@ void CrealityDWINClass::Draw_Status_Area(bool icons/*=false*/) {
     }
     if (zoffsetvalue != offset) {
       offset = zoffsetvalue;
-      DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 2, 2, 207, 417, (zoffsetvalue < 0 ? -zoffsetvalue : zoffsetvalue) * 100);
+      DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 2, 2, 207, 417, (zoffsetvalue < 0 ? -zoffsetvalue : zoffsetvalue));
       DWIN_Draw_String(true, DWIN_FONT_MENU, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 205, 419, zoffsetvalue < 0 ? F("-") : F(" "));
     }
   #endif
@@ -3246,7 +3246,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             break;
           case LEVELING_VIEW:
             if (draw)
-              Draw_Menu_Item(row, ICON_Mesh, "Mesh Viewer", nullptr, true);
+              Draw_Menu_Item(row, ICON_Mesh, GET_TEXT(MSG_MESH_VIEW), nullptr, true);
             else {
               #if ENABLED(AUTO_BED_LEVELING_UBL)
                 if (ubl.storage_slot < 0) {
@@ -3319,7 +3319,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             break;
           case LEVELING_VIEW_MESH:
             if (draw)
-              Draw_Menu_Item(row, ICON_PrintSize, "Mesh Viewer", nullptr, true);
+              Draw_Menu_Item(row, ICON_PrintSize, GET_TEXT(MSG_MESH_VIEW), nullptr, true);
             else
               Draw_Menu(MeshViewer);
             break;
@@ -4070,9 +4070,9 @@ const char * CrealityDWINClass::Get_Menu_Title(uint8_t menu) {
     case InfoMain:          return "Info";
     #if HAS_MESH
       case Leveling:        return "Leveling";
-      case LevelView:       return "Mesh View";
+      case LevelView:       return GET_TEXT(MSG_MESH_VIEW);
       case LevelSettings:   return "Leveling Settings";
-      case MeshViewer:      return "Mesh Viewer";
+      case MeshViewer:      return GET_TEXT(MSG_MESH_VIEW);
       case LevelManual:     return "Manual Tuning";
     #endif
     #if ENABLED(AUTO_BED_LEVELING_UBL) && !HAS_BED_PROBE

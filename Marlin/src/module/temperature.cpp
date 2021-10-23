@@ -1102,7 +1102,7 @@ void Temperature::min_temp_error(const heater_id_t heater_id) {
                 lpq[lpq_ptr] = 0;
 
               if (++lpq_ptr >= lpq_len) lpq_ptr = 0;
-              work_pid[ee].Kc = (lpq[lpq_ptr] * planner.steps_to_mm[E_AXIS]) * PID_PARAM(Kc, ee);
+              work_pid[ee].Kc = (lpq[lpq_ptr] * planner.mm_per_step[E_AXIS]) * PID_PARAM(Kc, ee);
               pid_output += work_pid[ee].Kc;
             }
           #endif // PID_EXTRUSION_SCALING
@@ -2207,22 +2207,22 @@ void Temperature::init() {
 
   // Thermistor activation by MCU pin
   #if PIN_EXISTS(TEMP_0_TR_ENABLE)
-    OUT_WRITE(TEMP_0_TR_ENABLE_PIN,
+    OUT_WRITE(TEMP_0_TR_ENABLE_PIN, (
       #if TEMP_SENSOR_IS_ANY_MAX_TC(0)
-        1
+        HIGH
       #else
-        0
+        LOW
       #endif
-    );
+    ));
   #endif
   #if PIN_EXISTS(TEMP_1_TR_ENABLE)
-    OUT_WRITE(TEMP_1_TR_ENABLE_PIN,
+    OUT_WRITE(TEMP_1_TR_ENABLE_PIN, (
       #if TEMP_SENSOR_IS_ANY_MAX_TC(1)
-        1
+        HIGH
       #else
-        0
+        LOW
       #endif
-    );
+    ));
   #endif
 
   #if HAS_HEATER_0
