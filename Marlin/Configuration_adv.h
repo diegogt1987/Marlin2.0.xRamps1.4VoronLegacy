@@ -816,7 +816,7 @@
 
   // Safety: The probe needs time to recognize the command.
   //         Minimum command delay (ms). Enable and increase if needed.
-  //#define BLTOUCH_DELAY 200
+  //#define BLTOUCH_DELAY 500
 
   /**
    * Settings for BLTOUCH Classic 1.2, 1.3 or BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1, and most clones:
@@ -1250,7 +1250,7 @@
   //#define SOUND_MENU_ITEM
 
   /**
-   * LED Control Menu\
+   * LED Control Menu
    * Add LED Control to the LCD menu
    */
   //#define LED_CONTROL_MENU
@@ -1259,8 +1259,8 @@
     //#define NEO2_COLOR_PRESETS              // Enable a second NeoPixel Preset Color menu option
     #if ENABLED(LED_COLOR_PRESETS)
       #define LED_USER_PRESET_RED        255  // User defined RED value
-      #define LED_USER_PRESET_GREEN        0  // User defined GREEN value
-      #define LED_USER_PRESET_BLUE       255  // User defined BLUE value
+      #define LED_USER_PRESET_GREEN      128  // User defined GREEN value
+      #define LED_USER_PRESET_BLUE         0  // User defined BLUE value
       #define LED_USER_PRESET_WHITE      255  // User defined WHITE value
       #define LED_USER_PRESET_BRIGHTNESS 255  // User defined intensity
       #define LED_USER_PRESET_STARTUP       // Have the printer display the user preset color on startup
@@ -1295,7 +1295,7 @@
   #define STATUS_MESSAGE_SCROLLING
 
   // On the Info Screen, display XY with one decimal place when possible
-  #define LCD_DECIMAL_SMALL_XY
+  //#define LCD_DECIMAL_SMALL_XY
 
   // Add an 'M73' G-code to set the current percentage
   #define LCD_SET_PROGRESS_MANUALLY
@@ -1310,7 +1310,7 @@
     //#define SHOW_REMAINING_TIME         // Display estimated time to completion
     #if ENABLED(SHOW_REMAINING_TIME)
       //#define USE_M73_REMAINING_TIME    // Use remaining time from M73 command instead of estimation
-      #define ROTATE_PROGRESS_DISPLAY   // Display (P)rogress, (E)lapsed, and (R)emaining time
+      //#define ROTATE_PROGRESS_DISPLAY   // Display (P)rogress, (E)lapsed, and (R)emaining time
     #endif
   #endif
 
@@ -1383,7 +1383,7 @@
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
    */
-  #define POWER_LOSS_RECOVERY
+  //#define POWER_LOSS_RECOVERY
   #if ENABLED(POWER_LOSS_RECOVERY)
     #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
     //#define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
@@ -1860,18 +1860,18 @@
  *
  * Warning: Does not respect endstops!
  */
-#define BABYSTEPPING
+//#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
   //#define INTEGRATED_BABYSTEPPING         // EXPERIMENTAL integration of babystepping into the Stepper ISR
-  #define BABYSTEP_WITHOUT_HOMING
-  #define BABYSTEP_ALWAYS_AVAILABLE       // Allow babystepping at all times (not just during movement).
-  #define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
+  //#define BABYSTEP_WITHOUT_HOMING
+  //#define BABYSTEP_ALWAYS_AVAILABLE       // Allow babystepping at all times (not just during movement).
+  //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
   #define BABYSTEP_INVERT_Z false           // Change if Z babysteps should go the other way
   //#define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps
   #define BABYSTEP_MULTIPLICATOR_Z  1       // (steps or mm) Steps or millimeter distance for each Z babystep
   #define BABYSTEP_MULTIPLICATOR_XY 1       // (steps or mm) Steps or millimeter distance for each XY babystep
 
-  #define DOUBLECLICK_FOR_Z_BABYSTEPPING  // Double-click on the Status Screen for Z Babystepping.
+  //#define DOUBLECLICK_FOR_Z_BABYSTEPPING  // Double-click on the Status Screen for Z Babystepping.
   #if ENABLED(DOUBLECLICK_FOR_Z_BABYSTEPPING)
     #define DOUBLECLICK_MAX_INTERVAL 1250   // Maximum interval between clicks, in milliseconds.
                                             // Note: Extra time may be added to mitigate controller latency.
@@ -1883,7 +1883,7 @@
 
   //#define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
 
-  #define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
+  //#define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
     //#define BABYSTEP_HOTEND_Z_OFFSET      // For multiple hotends, babystep relative Z offsets
     //#define BABYSTEP_ZPROBE_GFX_OVERLAY   // Enable graphical overlay on Z-offset editor
@@ -1972,7 +1972,7 @@
  * Repeatedly attempt G29 leveling until it succeeds.
  * Stop after G29_MAX_RETRIES attempts.
  */
-#define G29_RETRY_AND_RECOVER
+//#define G29_RETRY_AND_RECOVER
 #if ENABLED(G29_RETRY_AND_RECOVER)
   #define G29_MAX_RETRIES 3
   #define G29_HALT_ON_FAILURE
@@ -2064,7 +2064,7 @@
 #endif
 
 // G5 Bézier Curve Support with XYZE destination and IJPQ offsets
-#define BEZIER_CURVE_SUPPORT        // Requires ~2666 bytes
+//#define BEZIER_CURVE_SUPPORT        // Requires ~2666 bytes
 
 #if EITHER(ARC_SUPPORT, BEZIER_CURVE_SUPPORT)
   //#define CNC_WORKSPACE_PLANES      // Allow G2/G3/G5 to operate in XY, ZX, or YZ planes
@@ -2313,6 +2313,7 @@
    */
   //#define EVENT_GCODE_TOOLCHANGE_T0 "G28 A\nG1 A0" // Extra G-code to run while executing tool-change command T0
   //#define EVENT_GCODE_TOOLCHANGE_T1 "G1 A10"       // Extra G-code to run while executing tool-change command T1
+  //#define EVENT_GCODE_TOOLCHANGE_ALWAYS_RUN        // Always execute above G-code sequences. Use with caution!
 
   /**
    * Tool Sensors detect when tools have been picked up or dropped.
@@ -2590,9 +2591,9 @@
   #define INTERPOLATE      true
 
   #if AXIS_IS_TMC(X)
-    #define X_CURRENT       600        // (mA) RMS current. Multiply by 1.414 for peak current.
+    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for sensorless homing
-    #define X_MICROSTEPS     32        // 0..256
+    #define X_MICROSTEPS     16        // 0..256
     #define X_RSENSE          0.11
     #define X_CHAIN_POS      -1        // -1..0: Not chained. 1: MCU MOSI connected. 2: Next in chain, ...
     //#define X_INTERPOLATE  true      // Enable to override 'INTERPOLATE' for the X axis
@@ -2608,9 +2609,9 @@
   #endif
 
   #if AXIS_IS_TMC(Y)
-    #define Y_CURRENT       600
+    #define Y_CURRENT       800
     #define Y_CURRENT_HOME  Y_CURRENT
-    #define Y_MICROSTEPS     32
+    #define Y_MICROSTEPS     16
     #define Y_RSENSE          0.11
     #define Y_CHAIN_POS      -1
     //#define Y_INTERPOLATE  true
@@ -2626,9 +2627,9 @@
   #endif
 
   #if AXIS_IS_TMC(Z)
-    #define Z_CURRENT       950
+    #define Z_CURRENT       800
     #define Z_CURRENT_HOME  Z_CURRENT
-    #define Z_MICROSTEPS     32
+    #define Z_MICROSTEPS     16
     #define Z_RSENSE          0.11
     #define Z_CHAIN_POS      -1
     //#define Z_INTERPOLATE  true
@@ -2689,8 +2690,8 @@
   #endif
 
   #if AXIS_IS_TMC(E0)
-    #define E0_CURRENT      600
-    #define E0_MICROSTEPS    32
+    #define E0_CURRENT      800
+    #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
     //#define E0_INTERPOLATE true
@@ -2824,7 +2825,7 @@
    * Use for drivers that do not use a dedicated enable pin, but rather handle the same
    * function through a communication line such as SPI or UART.
    */
-  #define SOFTWARE_DRIVER_ENABLE
+  //#define SOFTWARE_DRIVER_ENABLE
 
   /**
    * TMC2130, TMC2160, TMC2208, TMC2209, TMC5130 and TMC5160 only
@@ -2882,7 +2883,7 @@
    * M912 - Clear stepper driver overtemperature pre-warn condition flag.
    * M122 - Report driver parameters (Requires TMC_DEBUG)
    */
-  #define MONITOR_DRIVER_STATUS
+  //#define MONITOR_DRIVER_STATUS
 
   #if ENABLED(MONITOR_DRIVER_STATUS)
     #define CURRENT_STEP_DOWN     50  // [mA]
@@ -2897,7 +2898,7 @@
    * STEALTHCHOP_(XY|Z|E) must be enabled to use HYBRID_THRESHOLD.
    * M913 X/Y/Z/E to live tune the setting
    */
-  #define HYBRID_THRESHOLD
+  //#define HYBRID_THRESHOLD
 
   #define X_HYBRID_THRESHOLD     100  // [mm/s]
   #define X2_HYBRID_THRESHOLD    100
@@ -2985,7 +2986,7 @@
    * Enable M122 debugging command for TMC stepper drivers.
    * M122 S0/1 will enable continuous reporting.
    */
-  #define TMC_DEBUG
+  //#define TMC_DEBUG
 
   /**
    * You can set your own advanced settings by filling in predefined functions.

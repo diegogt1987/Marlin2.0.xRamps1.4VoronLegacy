@@ -103,7 +103,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 1
+#define SERIAL_PORT 0
 
 /**
  * Serial Port Baud Rate
@@ -116,7 +116,7 @@
  *
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
  */
-#define BAUDRATE 115200
+#define BAUDRATE 250000
 //#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate
 
 /**
@@ -139,10 +139,6 @@
 //#define BLUETOOTH
 
 // Choose the name from boards.h that matches your setup
-//BOARD_BTT_SKR_E3_DIP
-//BOARD_MKS_ROBIN_E3
-//BOARD_BTT_SKR_V2_0_REV_B
-//BOARD_RAMPS_14_EFB
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_RAMPS_14_EFB
 #endif
@@ -265,7 +261,6 @@
 
   #define PARKING_EXTRUDER_PARKING_X { -78, 184 }     // X positions for parking the extruders
   #define PARKING_EXTRUDER_GRAB_DISTANCE 1            // (mm) Distance to move beyond the parking point to grab the extruder
-  //#define MANUAL_SOLENOID_CONTROL                   // Manual control of docking solenoids with M380 S / M381
 
   #if ENABLED(PARKING_EXTRUDER)
 
@@ -868,10 +863,10 @@
  */
 #define X_DRIVER_TYPE  TMC2209_STANDALONE
 #define Y_DRIVER_TYPE  TMC2209_STANDALONE
-#define Z_DRIVER_TYPE  TMC2209_STANDALONE
+#define Z_DRIVER_TYPE  DRV8825
 //#define X2_DRIVER_TYPE A4988
 //#define Y2_DRIVER_TYPE A4988
-#define Z2_DRIVER_TYPE TMC2209_STANDALONE
+#define Z2_DRIVER_TYPE DRV8825
 //#define Z3_DRIVER_TYPE A4988
 //#define Z4_DRIVER_TYPE A4988
 //#define I_DRIVER_TYPE  A4988
@@ -939,15 +934,11 @@
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K]]], E0 [, E1[, E2...]]
  */
-#define X_FEEDRATE_MAX 120
-#define Y_FEEDRATE_MAX 120
-#define Z_FEEDRATE_MAX 5
-#define E0_FEEDRATE_MAX 15
-#define DEFAULT_MAX_FEEDRATE          { X_FEEDRATE_MAX, Y_FEEDRATE_MAX, Z_FEEDRATE_MAX, E0_FEEDRATE_MAX }
+#define DEFAULT_MAX_FEEDRATE          { 120, 120, 5, 15 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
-  #define MAX_FEEDRATE_EDIT_VALUES    { 600, 600, 20, 50 } // ...or, set your own edit limits
+  #define MAX_FEEDRATE_EDIT_VALUES    { 600, 600, 10, 50 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -971,10 +962,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-
-#define DEFAULT_ACCELERATION           800    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION   800    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION    800    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -1011,7 +1001,7 @@
  *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
-  #define JUNCTION_DEVIATION_MM 0.08 // (mm) Distance from real junction edge
+  #define JUNCTION_DEVIATION_MM 0.080 // (mm) Distance from real junction edge
   #define JD_HANDLE_SMALL_SEGMENTS    // Use curvature estimation instead of just the junction angle
                                       // for small segments (< 1mm) with large junction angles (> 135°).
 #endif
@@ -1091,8 +1081,8 @@
 /**
  * Z Servo Probe, such as an endstop switch on a rotating arm.
  */
-//#define Z_PROBE_SERVO_NR 0        // Defaults to SERVO 0 connector.
-//#define Z_SERVO_ANGLES { 70, 10 } // Z Servo Deploy and Stow angles
+//#define Z_PROBE_SERVO_NR 0       // Defaults to SERVO 0 connector.
+//#define Z_SERVO_ANGLES { 70, 0 } // Z Servo Deploy and Stow angles
 
 /**
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
@@ -1196,10 +1186,10 @@
 #define PROBING_MARGIN 15
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_FEEDRATE (((X_FEEDRATE_MAX+Y_FEEDRATE_MAX)/2)*60)
+#define XY_PROBE_FEEDRATE (120*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_FEEDRATE_FAST (Z_FEEDRATE_MAX*60)
+#define Z_PROBE_FEEDRATE_FAST (4*60)
 
 // Feedrate (mm/min) for the "accurate" probe of each point
 #define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2)
@@ -1292,7 +1282,7 @@
 //#define PROBING_FANS_OFF          // Turn fans off when probing
 //#define PROBING_ESTEPPERS_OFF     // Turn all extruder steppers off when probing
 //#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including extruders)
-#define DELAY_BEFORE_PROBING 0  // (ms) To prevent vibrations from triggering piezo sensors
+//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
 
 // Require minimum nozzle and/or bed temperature for probing
 //#define PREHEAT_BEFORE_PROBING
@@ -1555,8 +1545,8 @@
  * these options to restore the prior leveling state or to always enable
  * leveling immediately after G28.
  */
-//#define RESTORE_LEVELING_AFTER_G28
-#define ENABLE_LEVELING_AFTER_G28
+#define RESTORE_LEVELING_AFTER_G28
+//#define ENABLE_LEVELING_AFTER_G28
 
 /**
  * Auto-leveling needs preheating
@@ -1613,7 +1603,7 @@
 #if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 5
+  #define GRID_MAX_POINTS_X 4
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Probe along the Y axis, advancing X after each column
@@ -1682,7 +1672,7 @@
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
   #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
-  #define MESH_EDIT_MENU        // Add a menu to edit mesh points
+  //#define MESH_EDIT_MENU        // Add a menu to edit mesh points
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
@@ -1755,7 +1745,7 @@
 #endif
 
 // Homing speeds (mm/min)
-#define HOMING_FEEDRATE_MM_M { (X_FEEDRATE_MAX*60), (Y_FEEDRATE_MAX*60), (Z_FEEDRATE_MAX*60) }
+#define HOMING_FEEDRATE_MM_M { (50*60), (50*60), (4*60) }
 
 // Validate that endstops are triggered on homing moves
 #define VALIDATE_HOMING_ENDSTOPS
@@ -1837,7 +1827,7 @@
 #define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
-  #define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
+  //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
 #endif
 
 //
@@ -2964,7 +2954,7 @@
 // (ms) Delay before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.
 // If the servo can't reach the requested position, increase it.
-#define SERVO_DELAY { 200 }
+#define SERVO_DELAY { 300 }
 
 // Only power servos during movement, otherwise leave off to prevent jitter
 //#define DEACTIVATE_SERVOS_AFTER_MOVE
