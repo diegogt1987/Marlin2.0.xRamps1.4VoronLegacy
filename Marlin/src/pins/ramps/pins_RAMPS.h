@@ -99,10 +99,10 @@
 #endif
 #ifndef Z_STOP_PIN
   #ifndef Z_MIN_PIN
-    #define Z_MIN_PIN                         18
+    #define Z_MIN_PIN                         19
   #endif
   #ifndef Z_MAX_PIN
-    #define Z_MAX_PIN                         19
+    #define Z_MAX_PIN                         18
   #endif
 #endif
 
@@ -167,6 +167,19 @@
 #endif
 #ifndef E1_CS_PIN
   #define E1_CS_PIN                           44
+#endif
+
+#ifndef Z2_STEP_PIN
+  #define Z2_STEP_PIN                         36
+#endif
+#ifndef Z2_DIR_PIN
+  #define Z2_DIR_PIN                          34
+#endif
+#ifndef Z2_ENABLE_PIN
+  #define Z2_ENABLE_PIN                       30
+#endif
+#ifndef Z2_CS_PIN
+  #define Z2_CS_PIN                           44
 #endif
 
 //
