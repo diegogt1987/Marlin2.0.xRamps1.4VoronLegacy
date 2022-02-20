@@ -523,7 +523,7 @@
 
 #if ENABLED(BOOT_MARLIN_LOGO_ANIMATED)
   #ifndef MARLIN_BOOTSCREEN_FRAME_TIME
-    #define MARLIN_BOOTSCREEN_FRAME_TIME 100 // (ms)
+    #define MARLIN_BOOTSCREEN_FRAME_TIME 50 // (ms)
   #endif
   const unsigned char * const marlin_bootscreen_animation[] PROGMEM = {
     start_bmp1, start_bmp2, start_bmp3, start_bmp4, start_bmp5, start_bmp6, start_bmp

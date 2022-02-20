@@ -35,7 +35,7 @@
  *
  * Advanced settings can be found in Configuration_adv.h
  */
-#define CONFIGURATION_H_VERSION 02000902
+#define CONFIGURATION_H_VERSION 02000903
 
 //===========================================================================
 //============================= Getting Started =============================
@@ -95,6 +95,11 @@
 
 // @section machine
 
+// Choose the name from boards.h that matches your setup
+#ifndef MOTHERBOARD
+  #define MOTHERBOARD BOARD_RAMPS_14_EFB
+#endif
+
 /**
  * Select the serial port on the board to use for communication with the host.
  * This allows the connection of wireless adapters (for instance) to non-default port pins.
@@ -137,11 +142,6 @@
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
-
-// Choose the name from boards.h that matches your setup
-#ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_14_EFB
-#endif
 
 // Name displayed in the LCD "Ready" message and Info menu
 #define CUSTOM_MACHINE_NAME "Voron Legacy"
@@ -757,6 +757,7 @@
 //#define COREZX
 //#define COREZY
 //#define MARKFORGED_XY  // MarkForged. See https://reprap.org/forum/read.php?152,504042
+//#define MARKFORGED_YX
 
 // Enable for a belt style printer with endless "Z" motion
 //#define BELTPRINTER
@@ -934,7 +935,7 @@
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 100, 100, 5, 20 }
+#define DEFAULT_MAX_FEEDRATE          { 100, 100, 5, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1001,7 +1002,7 @@
  *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
-  #define JUNCTION_DEVIATION_MM 0.080 // (mm) Distance from real junction edge
+  #define JUNCTION_DEVIATION_MM 0.013 // (mm) Distance from real junction edge
   #define JD_HANDLE_SMALL_SEGMENTS    // Use curvature estimation instead of just the junction angle
                                       // for small segments (< 1mm) with large junction angles (> 135°).
 #endif
@@ -1186,7 +1187,7 @@
 #define PROBING_MARGIN 15
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_FEEDRATE (120*60)
+#define XY_PROBE_FEEDRATE (100*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
 #define Z_PROBE_FEEDRATE_FAST (4*60)
@@ -1222,6 +1223,15 @@
 #endif
 
 /**
+ * Probe Enable / Disable
+ * The probe only provides a triggered signal when enabled.
+ */
+//#define PROBE_ENABLE_DISABLE
+#if ENABLED(PROBE_ENABLE_DISABLE)
+  //#define PROBE_ENABLE_PIN -1   // Override the default pin here
+#endif
+
+/**
  * Multiple Probing
  *
  * You may get improved results by probing 2 or more times.
@@ -1230,7 +1240,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 2
+//#define MULTIPLE_PROBING 2
 //#define EXTRA_PROBING    1
 
 /**
@@ -1259,7 +1269,7 @@
 #define Z_PROBE_OFFSET_RANGE_MAX 20
 
 // Enable the M48 repeatability test to test probe accuracy
-#define Z_MIN_PROBE_REPEATABILITY_TEST
+//#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 // Before deploy/stow pause for user confirmation
 //#define PAUSE_BEFORE_DEPLOY_STOW
@@ -1418,7 +1428,7 @@
 #endif
 
 #if EITHER(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
-  #define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
+  //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
 #endif
 
 /**
@@ -1545,8 +1555,8 @@
  * these options to restore the prior leveling state or to always enable
  * leveling immediately after G28.
  */
-#define RESTORE_LEVELING_AFTER_G28
-//#define ENABLE_LEVELING_AFTER_G28
+//#define RESTORE_LEVELING_AFTER_G28
+#define ENABLE_LEVELING_AFTER_G28
 
 /**
  * Auto-leveling needs preheating
@@ -1603,7 +1613,7 @@
 #if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 4
+  #define GRID_MAX_POINTS_X 5
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Probe along the Y axis, advancing X after each column
@@ -1828,6 +1838,7 @@
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
   //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
+  #define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.
 #endif
 
 //
@@ -2383,6 +2394,11 @@
 //#define miniVIKI
 
 //
+// Alfawise Ex8 printer LCD marked as WYH L12864 COG
+//
+//#define WYH_L12864
+
+//
 // MakerLab Mini Panel with graphic
 // controller and SD support - https://reprap.org/wiki/Mini_panel
 //
@@ -2450,6 +2466,11 @@
 //#define FYSETC_MINI_12864_2_0    // Type A/B. Discreet RGB Backlight
 //#define FYSETC_MINI_12864_2_1    // Type A/B. NeoPixel RGB Backlight
 //#define FYSETC_GENERIC_12864_1_1 // Larger display with basic ON/OFF backlight.
+
+//
+// BigTreeTech Mini 12864 V1.0 is an alias for FYSETC_MINI_12864_2_1. Type A/B. NeoPixel RGB Backlight.
+//
+//#define BTT_MINI_12864_V1
 
 //
 // Factory display for Creality CR-10
@@ -2643,32 +2664,32 @@
  */
 
 //
-// 480x320, 3.5", SPI Display From MKS
-// Normally used in MKS Robin Nano V2
+// 480x320, 3.5", SPI Display with Rotary Encoder from MKS
+// Usually paired with MKS Robin Nano V2 & V3
 //
 //#define MKS_TS35_V2_0
 
 //
 // 320x240, 2.4", FSMC Display From MKS
-// Normally used in MKS Robin Nano V1.2
+// Usually paired with MKS Robin Nano V1.2
 //
 //#define MKS_ROBIN_TFT24
 
 //
 // 320x240, 2.8", FSMC Display From MKS
-// Normally used in MKS Robin Nano V1.2
+// Usually paired with MKS Robin Nano V1.2
 //
 //#define MKS_ROBIN_TFT28
 
 //
 // 320x240, 3.2", FSMC Display From MKS
-// Normally used in MKS Robin Nano V1.2
+// Usually paired with MKS Robin Nano V1.2
 //
 //#define MKS_ROBIN_TFT32
 
 //
 // 480x320, 3.5", FSMC Display From MKS
-// Normally used in MKS Robin Nano V1.2
+// Usually paired with MKS Robin Nano V1.2
 //
 //#define MKS_ROBIN_TFT35
 
@@ -2679,7 +2700,7 @@
 
 //
 // 320x240, 3.2", FSMC Display From MKS
-// Normally used in MKS Robin
+// Usually paired with MKS Robin
 //
 //#define MKS_ROBIN_TFT_V1_1R
 
@@ -2709,9 +2730,14 @@
 //#define ANET_ET5_TFT35
 
 //
-// 1024x600, 7", RGB Stock Display from BIQU-BX
+// 1024x600, 7", RGB Stock Display with Rotary Encoder from BIQU-BX
 //
 //#define BIQU_BX_TFT70
+
+//
+// 480x320, 3.5", SPI Stock Display with Rotary Encoder from BIQU B1 SE Series
+//
+//#define BTT_TFT35_SPI_V1_0
 
 //
 // Generic TFT with detailed options
@@ -2767,23 +2793,11 @@
 //
 // Ender-3 v2 OEM display. A DWIN display with Rotary Encoder.
 //
-//#define DWIN_CREALITY_LCD
-
-//
-// Ender-3 v2 OEM display, enhanced.
-//
-//#define DWIN_CREALITY_LCD_ENHANCED
-
-//
-// Ender-3 v2 OEM display with enhancements by Jacob Myers
-//
-//#define DWIN_CREALITY_LCD_JYERSUI
-
-//
-// MarlinUI for Creality's DWIN display (and others)
-//
-//#define DWIN_MARLINUI_PORTRAIT
-//#define DWIN_MARLINUI_LANDSCAPE
+//#define DWIN_CREALITY_LCD           // Creality UI
+//#define DWIN_CREALITY_LCD_ENHANCED  // Enhanced UI
+//#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
+//#define DWIN_MARLINUI_PORTRAIT      // MarlinUI (portrait orientation)
+//#define DWIN_MARLINUI_LANDSCAPE     // MarlinUI (landscape orientation)
 
 //
 // Touch Screen Settings
@@ -2819,6 +2833,11 @@
 //#define REPRAPWORLD_KEYPAD
 //#define REPRAPWORLD_KEYPAD_MOVE_STEP 10.0 // (mm) Distance to move per key-press
 
+//
+// EasyThreeD ET-4000+ with button input and status LED
+//
+//#define EASYTHREED_UI
+
 //=============================================================================
 //=============================== Extra Features ==============================
 //=============================================================================
@@ -2828,9 +2847,6 @@
 // Set number of user-controlled fans. Disable to use all board-defined fans.
 // :[1,2,3,4,5,6,7,8]
 //#define NUM_M106_FANS 1
-
-// Increase the FAN PWM frequency. Removes the PWM noise but increases heating in the FET/Arduino
-//#define FAST_PWM_FAN
 
 // Use software PWM to drive the fan, as for the heaters. This uses a very low frequency
 // which is not as annoying as with the hardware PWM. On the other hand, if this frequency
@@ -2892,38 +2908,38 @@
 //#define RGBW_LED
 
 #if EITHER(RGB_LED, RGBW_LED)
-  #define RGB_LED_R_PIN 25 //34
-  #define RGB_LED_G_PIN 27 //43
-  #define RGB_LED_B_PIN 29 //35
-  #define RGB_LED_W_PIN -1
+  //#define RGB_LED_R_PIN 34
+  //#define RGB_LED_G_PIN 43
+  //#define RGB_LED_B_PIN 35
+  //#define RGB_LED_W_PIN -1
 #endif
 
 // Support for Adafruit NeoPixel LED driver
-//#define NEOPIXEL_LED
+#define NEOPIXEL_LED
 #if ENABLED(NEOPIXEL_LED)
   #define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
-  //#define NEOPIXEL_PIN     4     // LED driving pin
-  //#define NEOPIXEL2_TYPE NEOPIXEL_TYPE
-  //#define NEOPIXEL2_PIN    5
-  #define NEOPIXEL_PIXELS 30       // Number of LEDs in the strip. (Longest strip when NEOPIXEL2_SEPARATE is disabled.)
+  #define NEOPIXEL_PIN     34 //4      // LED driving pin
+  #define NEOPIXEL2_TYPE NEOPIXEL_TYPE
+  #define NEOPIXEL2_PIN    43 //5
+  #define NEOPIXEL_PIXELS  3       // Number of LEDs in the strip. (Longest strip when NEOPIXEL2_SEPARATE is disabled.)
   #define NEOPIXEL_IS_SEQUENTIAL   // Sequential display for temperature change - LED by LED. Disable to change all LEDs at once.
   #define NEOPIXEL_BRIGHTNESS 127  // Initial brightness (0-255)
-  //#define NEOPIXEL_STARTUP_TEST  // Cycle through colors at startup
+  #define NEOPIXEL_STARTUP_TEST    // Cycle through colors at startup
 
   // Support for second Adafruit NeoPixel LED driver controlled with M150 S1 ...
   //#define NEOPIXEL2_SEPARATE
   #if ENABLED(NEOPIXEL2_SEPARATE)
-    #define NEOPIXEL2_PIXELS      15  // Number of LEDs in the second strip
+    #define NEOPIXEL2_PIXELS       1  // Number of LEDs in the second strip
     #define NEOPIXEL2_BRIGHTNESS 127  // Initial brightness (0-255)
     #define NEOPIXEL2_STARTUP_TEST    // Cycle through colors at startup
   #else
-    //#define NEOPIXEL2_INSERIES      // Default behavior is NeoPixel 2 in parallel
+    #define NEOPIXEL2_INSERIES      // Default behavior is NeoPixel 2 in parallel
   #endif
 
   // Use some of the NeoPixel LEDs for static (background) lighting
-  //#define NEOPIXEL_BKGD_INDEX_FIRST  0              // Index of the first background LED
-  //#define NEOPIXEL_BKGD_INDEX_LAST   5              // Index of the last background LED
-  //#define NEOPIXEL_BKGD_COLOR { 255, 255, 255, 0 }  // R, G, B, W
+  #define NEOPIXEL_BKGD_INDEX_FIRST  1              // Index of the first background LED
+  #define NEOPIXEL_BKGD_INDEX_LAST   2              // Index of the last background LED
+  #define NEOPIXEL_BKGD_COLOR { 255, 255, 255, 255 }  // R, G, B, W
   //#define NEOPIXEL_BKGD_ALWAYS_ON                   // Keep the backlight on when other NeoPixels are off
 #endif
 
